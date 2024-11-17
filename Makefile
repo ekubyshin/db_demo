@@ -22,3 +22,7 @@ db-up: $(GOOSE_BIN)
 .PHONY: lint
 lint: $(GOLANGCI_BIN)
 	$(GOLANGCI_BIN) run --fix ./...
+
+.PHONY: test
+test:
+	go test -v -cover ./...

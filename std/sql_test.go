@@ -9,8 +9,9 @@ import (
 )
 
 func clearDB(db *sql.DB, t *testing.T) {
-	_, err := db.Exec("DELETE FROM authors WHERE true")
-	require.NoError(t, err)
+	_, _ = db.Exec("DELETE FROM authors WHERE true")
+	_, _ = db.Exec("DELETE FROM authors_books WHERE true")
+	_, _ = db.Exec("DELETE FROM books WHERE true")
 }
 
 func fillTestData(db *sql.DB, t *testing.T) {
@@ -24,4 +25,5 @@ func TestSQL(t *testing.T) {
 	defer db.Close()
 	err := dblib.Migrate(db)
 	require.NoError(t, err)
+	clearDB(db, t)
 }
