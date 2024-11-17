@@ -52,4 +52,50 @@ func TestStorage_Authors(t *testing.T) {
 		}
 		require.Equal(t, want, got)
 	})
+
+	t.Run("CreateAuthor", func(t *testing.T) {
+		clearDB(db, t)
+		s := std.NewStorage(db)
+		author := models.Author{Name: "Author 1"}
+		got, err := s.CreateAuthor(author)
+		require.NoError(t, err)
+		want := &models.Author{ID: 1, Name: "Author 1"}
+		require.Equal(t, want, got)
+		err = s.DeleteAuthor(got.ID)
+		require.NoError(t, err)
+		got2, err2 := s.GetAuthor(got.ID)
+		require.Error(t, err2)
+		require.Nil(t, got2)
+	})
+
+	t.Run("UpdateAuthor", func(t *testing.T) {
+		clearDB(db, t)
+		s := std.NewStorage(db)
+		author := models.Author{Name: "Author 1"}
+		got, err := s.CreateAuthor(author)
+		require.NoError(t, err)
+		got.Name = "Author 1 updated"
+		got, err = s.UpdateAuthor(*got)
+		require.NoError(t, err)
+		want := &models.Author{ID: 1, Name: "Author 1 updated"}
+		require.Equal(t, want, got)
+	})
+
+	t.Run("BalkCreateAuthor", func(t *testing.T) {
+		clearDB(db, t)
+		s := std.NewStorage(db)
+		authors := []models.Author{
+			{Name: "Author 1"},
+			{Name: "Author 2"},
+			{Name: "Author 3"},
+		}
+		got, err := s.BalkCreateAuthor(authors)
+		require.NoError(t, err)
+		want := []models.Author{
+			{ID: 1, Name: "Author 1"},
+			{ID: 2, Name: "Author 2"},
+			{ID: 3, Name: "Author 3"},
+		}
+		require.Equal(t, want, got)
+	})
 }

@@ -58,3 +58,12 @@ func (s *Storage) GetBook(id int64) (*models.Book, error) {
 
 	return &book, nil
 }
+
+func (s *Storage) CreateBook(book models.Book) (*models.Book, error) {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback() //nolint
+	return nil, nil
+}

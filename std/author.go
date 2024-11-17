@@ -1,6 +1,10 @@
 package std
 
-import "github.com/ekubyshin/db_demo/models"
+import (
+	"errors"
+
+	"github.com/ekubyshin/db_demo/models"
+)
 
 var queryListAuthors = `
 SELECT * FROM authors
@@ -28,13 +32,13 @@ var queryAuthor = `
 SELECT * FROM authors WHERE id = $1 LIMIT 1
 `
 
-func (s *Storage) GetAuthor(id int64) (models.Author, error) {
+func (s *Storage) GetAuthor(id int64) (*models.Author, error) {
 	var author models.Author
 	err := s.db.QueryRow(queryAuthor, id).Scan(&author.ID, &author.Name)
 	if err != nil {
-		return models.Author{}, err
+		return nil, err
 	}
-	return author, nil
+	return &author, nil
 }
 
 var queryAuthorBooks = `
@@ -73,4 +77,64 @@ func (s *Storage) GetAuthorBooks(id int64) ([]models.Book, error) {
 		books = append(books, book)
 	}
 	return books, nil
+}
+
+var queryCreateAuthor = `
+	INSERT INTO authors (name) VALUES ($1) RETURNING id
+`
+
+func (s *Storage) CreateAuthor(author models.Author) (*models.Author, error) {
+	var id int64
+	err := s.db.QueryRow(queryCreateAuthor, author.Name).Scan(&id)
+	if err != nil {
+		return nil, err
+	}
+	author.ID = id
+	return &author, nil
+}
+
+var queryUpdateAuthor = `
+	UPDATE authors SET name = $1 WHERE id = $2
+`
+
+func (s *Storage) UpdateAuthor(author models.Author) (*models.Author, error) {
+	_, err := s.db.Exec(queryUpdateAuthor, author.Name, author.ID)
+	if err != nil {
+		return nil, err
+	}
+	return &author, nil
+}
+
+var queryDeleteAuthor = `
+	DELETE FROM authors WHERE id = $1
+`
+
+func (s *Storage) DeleteAuthor(id int64) error {
+	_, err := s.db.Exec(queryDeleteAuthor, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Storage) BalkCreateAuthor(authors []models.Author) ([]models.Author, error) {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback() //nolint
+	result := make([]models.Author, 0, len(authors))
+	for _, author := range authors {
+		var id int64
+		err := tx.QueryRow(queryCreateAuthor, author.Name).Scan(&id)
+		if err != nil {
+			return nil, err
+		}
+		author.ID = id
+		result = append(result, author)
+	}
+	if len(result) != len(authors) {
+		return nil, errors.New("not all authors created")
+	}
+	return result, tx.Commit()
 }
