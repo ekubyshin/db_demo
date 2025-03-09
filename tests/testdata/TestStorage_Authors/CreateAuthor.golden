@@ -1,0 +1,18 @@
+[]models.Author{
+	{
+		ID:   1,
+		Name: "Author 1",
+	},
+	{
+		ID:   2,
+		Name: "Author 2",
+	},
+	{
+		ID:   3,
+		Name: "Author 3",
+	},
+	{
+		ID:   4,
+		Name: "Author test",
+	},
+}

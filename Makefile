@@ -13,11 +13,11 @@ $(GOOSE_BIN):
 
 .PHONY: db-create
 db-create: $(GOOSE_BIN)
-	goose -dir migrations create $(NAME) sql
+	goose -dir db/migrations create $(NAME) sql
 
 .PHONY: db-up
 db-up: $(GOOSE_BIN)
-	goose -dir migrations up
+	goose -dir db/migrations up
 
 .PHONY: lint
 lint: $(GOLANGCI_BIN)
@@ -26,3 +26,24 @@ lint: $(GOLANGCI_BIN)
 .PHONY: test
 test:
 	go test -v -cover ./...
+
+.PHONY: test-update
+test-update:
+	go test ./... -update
+
+SQLC_BIN=$(LOCAL_BIN)/sqlc
+$(SQLC_BIN):
+	GOBIN=$(LOCAL_BIN) go install github.com/sqlc-dev/sqlc/cmd/sqlc
+
+.PHONY: sql-format
+sql-format:
+	pg_format -i sqlc/*.sql
+
+.PHONY: sqlc
+sqlc: $(SQLC_BIN) sql-format
+	rm -f sqlc/*.go
+	$(SQLC_BIN) generate
+
+.PHONY: sqlc-diff
+sqlc-diff: $(SQLC_BIN)
+	$(SQLC_BIN) diff

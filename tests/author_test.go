@@ -6,6 +6,7 @@ import (
 	dblib "github.com/ekubyshin/db_demo/db"
 	"github.com/ekubyshin/db_demo/models"
 	"github.com/ekubyshin/db_demo/std"
+	"github.com/hexops/autogold/v2"
 	"github.com/stretchr/testify/require"
 )
 
@@ -16,86 +17,57 @@ func TestStorage_Authors(t *testing.T) {
 	defer db.Close()
 	err := dblib.Migrate(db)
 	require.NoError(t, err)
+	fillTestData(db, t)
+	storage := std.NewStorage(db)
 
-	t.Run("GetAuthors empty", func(t *testing.T) {
-		storage := std.NewStorage(db)
-		authors, err := storage.GetAuthors()
+	t.Run("getAuthors list", func(t *testing.T) {
+		got, err := storage.GetAuthors()
 		require.NoError(t, err)
-		require.Equal(t, 0, len(authors))
+		autogold.ExpectFile(t, got)
 	})
 
-	t.Run("test getAuthors list", func(t *testing.T) {
-		fillTestData(db, t)
-		s := std.NewStorage(db)
-		got, err := s.GetAuthors()
+	t.Run("getAuthorsByID", func(t *testing.T) {
+		author, err := storage.GetAuthor(1)
 		require.NoError(t, err)
-		want := []models.Author{
-			{ID: 1, Name: "Author 1"},
-			{ID: 2, Name: "Author 2"},
-			{ID: 3, Name: "Author 3"},
-		}
-		require.Equal(t, want, got)
-		got2, err := s.GetAuthor(1)
-		require.NoError(t, err)
-		require.Equal(t, models.Author{ID: 1, Name: "Author 1"}, got2)
+		autogold.ExpectFile(t, author, autogold.Name("TestStorage/getAuthorsByID"))
 	})
 
 	t.Run("GetAuthorBooks", func(t *testing.T) {
-		clearDB(db, t)
-		fillTestData(db, t)
-		s := std.NewStorage(db)
-		got, err := s.GetAuthorBooks(1)
+		got, err := storage.GetAuthorBooks(1)
 		require.NoError(t, err)
-		want := []models.Book{
-			{ID: 1, Title: "Book 1", Authors: []models.Author{{ID: 1, Name: "Author 1"}}},
-			{ID: 2, Title: "Book 2", Authors: []models.Author{{ID: 1, Name: "Author 1"}, {ID: 2, Name: "Author 2"}}},
-		}
-		require.Equal(t, want, got)
+		autogold.ExpectFile(t, got)
 	})
 
 	t.Run("CreateAuthor", func(t *testing.T) {
-		clearDB(db, t)
-		s := std.NewStorage(db)
-		author := models.Author{Name: "Author 1"}
-		got, err := s.CreateAuthor(author)
+		author := models.Author{Name: "Author test"}
+		_, err := storage.CreateAuthor(author)
 		require.NoError(t, err)
-		want := &models.Author{ID: 1, Name: "Author 1"}
-		require.Equal(t, want, got)
-		err = s.DeleteAuthor(got.ID)
-		require.NoError(t, err)
-		got2, err2 := s.GetAuthor(got.ID)
-		require.Error(t, err2)
-		require.Nil(t, got2)
+		lst, err := storage.GetAuthors()
+		autogold.ExpectFile(t, lst)
 	})
 
 	t.Run("UpdateAuthor", func(t *testing.T) {
-		clearDB(db, t)
-		s := std.NewStorage(db)
-		author := models.Author{Name: "Author 1"}
-		got, err := s.CreateAuthor(author)
+		author := models.Author{Name: "Author test2"}
+		got, err := storage.CreateAuthor(author)
 		require.NoError(t, err)
-		got.Name = "Author 1 updated"
-		got, err = s.UpdateAuthor(*got)
+		got.Name = "Author test2 updated"
+		got, err = storage.UpdateAuthor(*got)
 		require.NoError(t, err)
-		want := &models.Author{ID: 1, Name: "Author 1 updated"}
-		require.Equal(t, want, got)
+		lst, err := storage.GetAuthors()
+		require.NoError(t, err)
+		autogold.ExpectFile(t, lst)
 	})
 
 	t.Run("BalkCreateAuthor", func(t *testing.T) {
-		clearDB(db, t)
-		s := std.NewStorage(db)
 		authors := []models.Author{
-			{Name: "Author 1"},
-			{Name: "Author 2"},
-			{Name: "Author 3"},
+			{Name: "Author test1"},
+			{Name: "Author test2"},
+			{Name: "Author test3"},
 		}
-		got, err := s.BalkCreateAuthor(authors)
+		_, err := storage.BalkCreateAuthor(authors)
 		require.NoError(t, err)
-		want := []models.Author{
-			{ID: 1, Name: "Author 1"},
-			{ID: 2, Name: "Author 2"},
-			{ID: 3, Name: "Author 3"},
-		}
-		require.Equal(t, want, got)
+		lst, err := storage.GetAuthors()
+		require.NoError(t, err)
+		autogold.ExpectFile(t, lst)
 	})
 }

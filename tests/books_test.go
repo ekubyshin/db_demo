@@ -6,6 +6,7 @@ import (
 	dblib "github.com/ekubyshin/db_demo/db"
 	"github.com/ekubyshin/db_demo/models"
 	"github.com/ekubyshin/db_demo/std"
+	"github.com/hexops/autogold/v2"
 	"github.com/stretchr/testify/require"
 )
 
@@ -17,25 +18,13 @@ func TestStorage_Books(t *testing.T) {
 	err := dblib.Migrate(db)
 	require.NoError(t, err)
 
-	t.Run("GetBooks empty", func(t *testing.T) {
-		storage := std.NewStorage(db)
-		books, err := storage.GetBooks()
-		require.NoError(t, err)
-		require.Equal(t, 0, len(books))
-	})
-
-	t.Run("GetBooks not empty", func(t *testing.T) {
+	t.Run("GetBooks", func(t *testing.T) {
 		clearDB(db, t)
 		fillTestData(db, t)
 		s := std.NewStorage(db)
 		got, err := s.GetBooks()
 		require.NoError(t, err)
-		want := []models.Book{
-			{ID: 1, Title: "Book 1", Authors: []models.Author{{ID: 1, Name: "Author 1"}}},
-			{ID: 2, Title: "Book 2", Authors: []models.Author{{ID: 1, Name: "Author 1"}, {ID: 2, Name: "Author 2"}}},
-			{ID: 3, Title: "Book 3", Authors: []models.Author{{ID: 3, Name: "Author 3"}}},
-		}
-		require.Equal(t, want, got)
+		autogold.ExpectFile(t, got)
 	})
 
 	t.Run("GetBook", func(t *testing.T) {

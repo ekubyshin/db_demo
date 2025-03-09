@@ -1,0 +1,44 @@
+version: "2"
+overrides:
+  go:
+    overrides:
+      - db_type: "pg_catalog.timestamp"
+        engine: "postgresql"
+        go_type: "time.Time"
+      - db_type: "pg_catalog.timestamptz"
+        engine: "postgresql"
+        go_type: "time.Time"
+      - db_type: "pg_catalog.timestamptz"
+        engine: "postgresql"
+        nullable: true
+        go_type:
+          import: "time"
+          type: "Time"
+          pointer: true
+      - db_type: "pg_catalog.timestamp"
+        engine: "postgresql"
+        nullable: true
+        go_type:
+          import: "time"
+          type: "Time"
+          pointer: true
+      - db_type: jsonb
+        go_type:
+          import: "encoding/json"
+          type: "RawMessage"
+      - db_type: jsonb
+        go_type:
+          import: "encoding/json"
+          type: "RawMessage"
+        nullable: true
+
+sql:
+  - engine: "postgresql"
+    queries: "sqlc"
+    schema: "db/migrations"
+    gen:
+      go:
+        package: "sqlc"
+        sql_package: "pgx/v5"
+        out: "sqlc"
+        emit_pointers_for_null_types: true
