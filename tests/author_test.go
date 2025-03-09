@@ -29,7 +29,7 @@ func TestStorage_Authors(t *testing.T) {
 	t.Run("getAuthorsByID", func(t *testing.T) {
 		author, err := storage.GetAuthor(1)
 		require.NoError(t, err)
-		autogold.ExpectFile(t, author, autogold.Name("TestStorage/getAuthorsByID"))
+		autogold.ExpectFile(t, author, autogold.Name("TestStorage_Authors/getAuthorsByID"))
 	})
 
 	t.Run("GetAuthorBooks", func(t *testing.T) {

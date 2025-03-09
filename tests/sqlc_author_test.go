@@ -37,7 +37,7 @@ func TestSQLCStorage_Authors(t *testing.T) {
 	t.Run("getAuthorsByID", func(t *testing.T) {
 		author, err := db.AuthorByID(ctx, 1)
 		require.NoError(t, err)
-		autogold.ExpectFile(t, author, autogold.Name("TestSQLCStorage/getAuthorsByID"))
+		autogold.ExpectFile(t, author, autogold.Name("TestSQLCStorage_Authors/getAuthorsByID"))
 	})
 
 	t.Run("GetAuthorBooks", func(t *testing.T) {

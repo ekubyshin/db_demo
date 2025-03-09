@@ -1,14 +1,13 @@
-# Demonstrate of different ways to work with Postgres
+# На простых примерах показаны различные способы работы с БД в Go
 
-## Used these packages
+## Используемые библиотеки
 
-- database/sql (https://pkg.go.dev/database/sql)
 - sqlx (https://jmoiron.github.io/sqlx/)
 - sqlc (https://sqlc.dev/)
 - gorm (https://gorm.io/)
 
 
-## Demonstrate these scenarios
+## Сценарии
 - Single select
 - Multiple select
 - Single insert

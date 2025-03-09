@@ -1,0 +1,25 @@
+[]gorm.Author{
+	{
+		Model: gorm.Model{
+			ID: 5,
+			DeletedAt: gorm.DeletedAt{
+				Valid: true,
+			},
+		},
+		Name: "Author test1",
+	},
+	{
+		Model: gorm.Model{
+			ID:        6,
+			DeletedAt: gorm.DeletedAt{Valid: true},
+		},
+		Name: "Author test2",
+	},
+	{
+		Model: gorm.Model{
+			ID:        7,
+			DeletedAt: gorm.DeletedAt{Valid: true},
+		},
+		Name: "Author test3",
+	},
+}

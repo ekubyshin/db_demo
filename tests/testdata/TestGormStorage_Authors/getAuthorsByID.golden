@@ -1,0 +1,19 @@
+[]gorm.Author{{
+	Model: gorm.Model{
+		ID: 1,
+		DeletedAt: gorm.DeletedAt{
+			Valid: true,
+		},
+	},
+	Name: "Author 1",
+	Books: []*gorm.Book{
+		{
+			Model: gorm.Model{ID: 1},
+			Title: "Book 1",
+		},
+		{
+			Model: gorm.Model{ID: 2},
+			Title: "Book 2",
+		},
+	},
+}}

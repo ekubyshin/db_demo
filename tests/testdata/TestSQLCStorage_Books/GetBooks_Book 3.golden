@@ -1,0 +1,6 @@
+[]sqlc.AuthorBooksRow{{
+	ID:    3,
+	Title: "Book 3",
+	ID_2:  3,
+	Name:  "Author 3",
+}}
